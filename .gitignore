@@ -1,0 +1,40 @@
+node_modules/
+dist
+.turbo
+.env
+pdfs/**
+src/generated/**
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# TypeScript build artifacts
+*.tsbuildinfo
+
+# IDE-specific files
+.vscode/
+.idea/
+*.swp
+
+# Test coverage reports
+coverage/
+
+# Temporary files
+tmp/
+temp/
+
+# Prisma-related files
+prisma/migrations/
+
+# Lock files (if not needed for version control)
+pnpm-lock.yaml
+yarn.lock

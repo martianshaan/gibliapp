@@ -1,0 +1,38 @@
+{
+  "name": "gibliapp-backend",
+  "version": "1.0.0",
+  "description": "Ghibli App Backend",
+  "main": "dist/server.js",
+  "scripts": {
+    "start": "nodemon dist/server.js",
+    "build": "pnpm tsc",
+    "dev": "nodemon --exec ts-node src/server.ts",
+    "dev:tsx": "nodemon --exec tsx src/server.ts",
+    "watch": "pnpm tsc --watch",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.500.0",
+    "@prisma/client": "^5.8.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-async-handler": "^1.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "nodemon": "^3.1.9",
+    "prisma": "^6.5.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/node": "^20.17.28",
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  }
+}

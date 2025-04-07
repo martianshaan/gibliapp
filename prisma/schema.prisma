@@ -1,0 +1,136 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String    @id @default(uuid()) @map("userId")
+  username      String    @unique
+  email         String    @unique
+  passwordHash  String
+  subscriptionTier String @default("free")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+  isActive      Boolean   @default(true)
+  
+  requests      GenerationRequest[]
+  images        GeneratedImage[]
+  credits       UserCredit[]
+
+  @@map("users")
+}
+
+enum RequestStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
+enum ImageFormat {
+  jpeg
+  png
+  webp
+}
+
+enum CreditTransactionType {
+  purchase
+  consumption
+  refund
+  bonus
+}
+
+model ApiProvider {
+  id         Int       @id @default(autoincrement()) @map("providerId")
+  name       String    @unique
+  websiteUrl String?
+  createdAt  DateTime  @default(now())
+  models     AiModel[]
+
+  @@map("api_providers")
+}
+
+model AiModel {
+  id              Int                @id @default(autoincrement()) @map("modelId")
+  provider        ApiProvider        @relation(fields: [providerId], references: [id])
+  providerId      Int
+  modelName       String
+  apiIdentifier   String             @unique
+  description     String?
+  isActive       Boolean            @default(true)
+  costPerRequest  Decimal?          @db.Decimal(10, 4)
+  createdAt      DateTime           @default(now())
+  requests       GenerationRequest[]
+
+  @@map("ai_models")
+}
+
+model GenerationRequest {
+  id                   String           @id @default(uuid()) @map("requestId")
+  user                 User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId               String
+  model                AiModel          @relation(fields: [modelId], references: [id])
+  modelId              Int
+  prompt               String
+  negativePrompt       String?
+  aspectRatio          String?
+  stylePreset          String?
+  seed                 BigInt?
+  numOutputs           Int              @default(1)
+  quality              String?
+  status               RequestStatus    @default(pending)
+  apiSpecificParameters Json?
+  errorMessage         String?
+  creditsCharged       Int              @default(0)
+  requestedAt          DateTime         @default(now())
+  processingStartedAt  DateTime?
+  completedAt          DateTime?
+  images               GeneratedImage[]
+  creditTransactions   UserCredit[]
+
+  @@map("generation_requests")
+}
+
+model GeneratedImage {
+  id                 String    @id @default(uuid()) @map("imageId")
+  request            GenerationRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  requestId          String
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId             String
+  imageUrl           String    @unique
+  thumbnailUrl       String?
+  storageProvider    String?
+  storagePath        String?
+  altText            String?
+  width              Int?
+  height             Int?
+  format             ImageFormat?
+  sizeBytes          BigInt?
+  apiResponseMetadata Json?
+  isFavorited        Boolean   @default(false)
+  isPublic           Boolean   @default(false)
+  generatedAt        DateTime  @default(now())
+
+  @@map("generated_images")
+}
+
+model UserCredit {
+  id              String    @id @default(uuid()) @map("transactionId")
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+  request         GenerationRequest? @relation(fields: [requestId], references: [id], onDelete: SetNull)
+  requestId       String?
+  transactionType CreditTransactionType
+  amount          Int
+  balanceAfter    Int
+  notes           String?
+  transactionTime DateTime  @default(now())
+
+  @@map("user_credits")
+}
